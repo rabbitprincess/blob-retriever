@@ -1,4 +1,4 @@
-package blobstore
+package blobrestore
 
 import (
 	"context"

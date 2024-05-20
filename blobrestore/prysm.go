@@ -1,4 +1,4 @@
-package blobstore
+package blobrestore
 
 import (
 	"math"
@@ -22,6 +22,8 @@ func NewPrysmBlobStorage(path string, start, end uint64) *PrysmBlobStorage {
 	}
 	return &PrysmBlobStorage{blobStorage: blobStorage}
 }
+
+var _ BlobStore = &PrysmBlobStorage{}
 
 type PrysmBlobStorage struct {
 	blobStorage *filesystem.BlobStorage

@@ -1,4 +1,4 @@
-package blobstore
+package blobrestore
 
 import (
 	"context"
@@ -16,22 +16,22 @@ const (
 	minBlobSlot   = 8626176 // mainnet minimum slot which save blobs
 )
 
-type BlobStore struct {
+type BlobRestore struct {
 	logger  zerolog.Logger
 	client  BeaconClient
-	storage *PrysmBlobStorage
+	storage BlobStore
 }
 
 // NewAPI creates a new Archiver API instance. This API exposes an admin interface to control the archiver.
-func NewAPI() *BlobStore {
-	result := &BlobStore{
+func NewAPI() *BlobRestore {
+	result := &BlobRestore{
 		logger: zerolog.New(nil),
 	}
 
 	return result
 }
 
-func (bs *BlobStore) RestoreBlob(ctx context.Context, fromSlot, toSlot uint64) error {
+func (bs *BlobRestore) RestoreBlob(ctx context.Context, fromSlot, toSlot uint64) error {
 	if fromSlot < minBlobSlot {
 		fromSlot = minBlobSlot
 	}
