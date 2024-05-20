@@ -1,4 +1,4 @@
-package blobrestore
+package restore
 
 import "github.com/attestantio/go-eth2-client/spec/deneb"
 

@@ -1,4 +1,4 @@
-package blobrestore
+package restore
 
 import (
 	"math"
