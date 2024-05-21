@@ -1,4 +1,4 @@
-package restore
+package blob
 
 import "github.com/attestantio/go-eth2-client/spec/deneb"
 

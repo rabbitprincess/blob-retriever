@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/rabbitprincess/blob_restorer/restore"
+	"github.com/rabbitprincess/blob-retriever/blob"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
@@ -42,7 +42,7 @@ func rootRun(cmd *cobra.Command, args []string) {
 	logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
 	ctx := context.Background()
 
-	blobRestore := restore.NewBlobRestore(ctx, logger, &restore.Config{
+	blobRestore := blob.NewBlobRestore(ctx, logger, &blob.Config{
 		BeaconUrl:   beaconUrl,
 		StoragePath: storagePath,
 		StorageType: storageType,

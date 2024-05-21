@@ -1,4 +1,4 @@
-module github.com/rabbitprincess/blob_restorer
+module github.com/rabbitprincess/blob-retriever
 
 go 1.22.1
 
