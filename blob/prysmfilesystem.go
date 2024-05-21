@@ -32,6 +32,14 @@ const (
 // BlobStorageOption is a functional option for configuring a BlobStorage.
 type BlobStorageOption func(*BlobStorage) error
 
+// WithBlobRetentionEpochs is an option that changes the number of epochs blobs will be persisted.
+func WithLogger(log zerolog.Logger) BlobStorageOption {
+	return func(b *BlobStorage) error {
+		b.log = log
+		return nil
+	}
+}
+
 // WithBasePath is a required option that sets the base path of blob storage.
 func WithBasePath(base string) BlobStorageOption {
 	return func(b *BlobStorage) error {
@@ -66,6 +74,7 @@ func NewBlobStorage(opts ...BlobStorageOption) (*BlobStorage, error) {
 			return nil, errors.Wrap(err, "failed to create blob storage")
 		}
 	}
+
 	if b.base == "" {
 		return nil, errNoBasePath
 	}
@@ -79,7 +88,7 @@ func NewBlobStorage(opts ...BlobStorageOption) (*BlobStorage, error) {
 
 // BlobStorage is the concrete implementation of the filesystem backend for saving and retrieving BlobSidecars.
 type BlobStorage struct {
-	log             *zerolog.Logger
+	log             zerolog.Logger
 	base            string
 	retentionEpochs primitives.Epoch
 	fsync           bool

@@ -23,6 +23,7 @@ func NewConfig(beaconUrl string, timeout time.Duration, storageType, storagePath
 }
 
 type Config struct {
+	Mode        string
 	BeaconUrl   string
 	Timeout     time.Duration
 	StorageType string

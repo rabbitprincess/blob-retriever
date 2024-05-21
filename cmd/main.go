@@ -14,7 +14,7 @@ var (
 		Use: "blob_restorer",
 		Run: rootRun,
 	}
-
+	mode        string
 	beaconUrl   string
 	storagePath string
 	storageType string
@@ -24,12 +24,13 @@ var (
 
 func init() {
 	fs := rootCmd.PersistentFlags()
-	fs.StringVarP(&beaconUrl, "beacon", "b", "", "Beacon node URL")
-	fs.StringVarP(&storagePath, "storage_path", "p", "", "Path to store blobs")
+	fs.StringVarP(&mode, "mode", "m", "check", "run mode (retrieve / check)")
+	fs.StringVarP(&beaconUrl, "beacon", "b", "https://ethereum-beacon-api.publicnode.com", "Beacon node URL")
+	fs.StringVarP(&storagePath, "storage_path", "p", "./data", "Path to store blobs")
 	// only support prysm for now
 	// fs.StringVarP(&storagePath, "storage_type", "s", "prysm", "Type to storage ( prysm or lighthouse )")
-	fs.Uint64VarP(&fromSlot, "from", "f", 0, "Start slot")
-	fs.Uint64VarP(&toSlot, "to", "t", 0, "End slot")
+	fs.Uint64VarP(&fromSlot, "from", "f", 9084721, "Start slot")
+	fs.Uint64VarP(&toSlot, "to", "t", 9084733, "End slot")
 }
 
 func main() {
@@ -42,11 +43,9 @@ func rootRun(cmd *cobra.Command, args []string) {
 	logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
 	ctx := context.Background()
 
-	blobRestore := blob.NewBlobRestore(ctx, logger, &blob.Config{
-		BeaconUrl:   beaconUrl,
-		StoragePath: storagePath,
-		StorageType: storageType,
-	})
+	cfg := blob.NewConfig(beaconUrl, 0, storageType, storagePath)
+	blobRestore := blob.NewBlobRestore(ctx, logger, cfg)
 
-	blobRestore.RestoreBlob(ctx, fromSlot, toSlot)
+	logger.Info().Str("mode", mode).Uint64("from slot", fromSlot).Uint64("to slot", toSlot).Msg("Run blob retriever")
+	blobRestore.Run(ctx, mode, fromSlot, toSlot)
 }

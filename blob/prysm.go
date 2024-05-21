@@ -8,10 +8,12 @@ import (
 	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
 	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
 	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/rs/zerolog"
 )
 
-func NewPrysmBlobStorage(path string) (*PrysmBlobStorage, error) {
+func NewPrysmBlobStorage(log zerolog.Logger, path string) (*PrysmBlobStorage, error) {
 	blobStorage, err := NewBlobStorage(
+		WithLogger(log),
 		WithBasePath(path),
 		WithBlobRetentionEpochs(math.MaxUint64),
 		WithSaveFsync(true),
@@ -74,6 +76,7 @@ func (p *PrysmBlobStorage) Valid(root [32]byte, denebSidecar *deneb.BlobSidecar)
 
 func ConvSideCar(denebSidecar *deneb.BlobSidecar) *ethpb.BlobSidecar {
 	var sidecar *ethpb.BlobSidecar = HydrateBlobSidecar(nil)
+	sidecar.Index = uint64(denebSidecar.Index)
 	sidecar.Blob = denebSidecar.Blob[:]
 	sidecar.KzgCommitment = denebSidecar.KZGCommitment[:]
 	sidecar.KzgProof = denebSidecar.KZGProof[:]

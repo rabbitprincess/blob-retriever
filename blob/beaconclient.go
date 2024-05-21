@@ -15,13 +15,13 @@ type BeaconClient interface {
 }
 
 // NewBeaconClient returns a new HTTP beacon client.
-func NewBeaconClient(ctx context.Context, beaconUrl string, timeout uint64) (BeaconClient, error) {
+func NewBeaconClient(ctx context.Context, beaconUrl string, timeout time.Duration) (BeaconClient, error) {
 	cctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	c, err := http.New(cctx,
+		http.WithTimeout(timeout),
 		http.WithAddress(beaconUrl),
-		http.WithTimeout(time.Duration(timeout)),
 		http.WithLogLevel(zerolog.ErrorLevel),
 		// http.WithEnforceJSON(cfg.EnforceJSON),
 	)
