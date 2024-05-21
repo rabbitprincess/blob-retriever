@@ -1,6 +1,7 @@
 package restore
 
 import (
+	"bytes"
 	"math"
 
 	"github.com/attestantio/go-eth2-client/spec/deneb"
@@ -11,16 +12,16 @@ import (
 	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
 )
 
-func NewPrysmBlobStorage(path string, start, end uint64) *PrysmBlobStorage {
+func NewPrysmBlobStorage(path string) (*PrysmBlobStorage, error) {
 	blobStorage, err := filesystem.NewBlobStorage(
 		filesystem.WithBasePath(path),
 		filesystem.WithBlobRetentionEpochs(math.MaxUint64),
 		filesystem.WithSaveFsync(true),
 	)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	return &PrysmBlobStorage{blobStorage: blobStorage}
+	return &PrysmBlobStorage{blobStorage: blobStorage}, nil
 }
 
 var _ BlobStore = &PrysmBlobStorage{}
@@ -49,6 +50,32 @@ func (p *PrysmBlobStorage) Save(root [32]byte, denebSidecar *deneb.BlobSidecar) 
 		return err
 	}
 	return p.blobStorage.Save(blocks.NewVerifiedROBlob(ROBlob))
+}
+
+func (p *PrysmBlobStorage) Get(root [32]byte, index uint64) (*ethpb.BlobSidecar, error) {
+	blob, err := p.blobStorage.Get(root, index)
+	if err != nil {
+		return nil, err
+	}
+
+	return blob.BlobSidecar, nil
+}
+
+func (p *PrysmBlobStorage) Valid(root [32]byte, denebSidecar *deneb.BlobSidecar) (bool, error) {
+	sidecar := ConvSideCar(denebSidecar)
+	ROBlob, err := blocks.NewROBlobWithRoot(sidecar, root)
+	if err != nil {
+		return false, err
+	}
+	marshal1, err := sidecar.MarshalSSZ()
+	if err != nil {
+		return false, err
+	}
+	marshal2, err := ROBlob.BlobSidecar.MarshalSSZ()
+	if err != nil {
+		return false, err
+	}
+	return bytes.Equal(marshal1, marshal2), nil
 }
 
 func ConvSideCar(denebSidecar *deneb.BlobSidecar) *ethpb.BlobSidecar {
