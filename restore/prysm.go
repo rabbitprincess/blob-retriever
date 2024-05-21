@@ -5,18 +5,16 @@ import (
 	"math"
 
 	"github.com/attestantio/go-eth2-client/spec/deneb"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db/filesystem"
 	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
 	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
 	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
 )
 
 func NewPrysmBlobStorage(path string) (*PrysmBlobStorage, error) {
-	blobStorage, err := filesystem.NewBlobStorage(
-		filesystem.WithBasePath(path),
-		filesystem.WithBlobRetentionEpochs(math.MaxUint64),
-		filesystem.WithSaveFsync(true),
+	blobStorage, err := NewBlobStorage(
+		WithBasePath(path),
+		WithBlobRetentionEpochs(math.MaxUint64),
+		WithSaveFsync(true),
 	)
 	if err != nil {
 		return nil, err
@@ -27,7 +25,7 @@ func NewPrysmBlobStorage(path string) (*PrysmBlobStorage, error) {
 var _ BlobStore = &PrysmBlobStorage{}
 
 type PrysmBlobStorage struct {
-	blobStorage *filesystem.BlobStorage
+	blobStorage *BlobStorage
 }
 
 func (p *PrysmBlobStorage) Exist(root [32]byte) bool {
@@ -45,11 +43,7 @@ func (p *PrysmBlobStorage) Exist(root [32]byte) bool {
 
 func (p *PrysmBlobStorage) Save(root [32]byte, denebSidecar *deneb.BlobSidecar) error {
 	sidecar := ConvSideCar(denebSidecar)
-	ROBlob, err := blocks.NewROBlobWithRoot(sidecar, root)
-	if err != nil {
-		return err
-	}
-	return p.blobStorage.Save(blocks.NewVerifiedROBlob(ROBlob))
+	return p.blobStorage.Save(root, sidecar)
 }
 
 func (p *PrysmBlobStorage) Get(root [32]byte, index uint64) (*ethpb.BlobSidecar, error) {
@@ -58,20 +52,20 @@ func (p *PrysmBlobStorage) Get(root [32]byte, index uint64) (*ethpb.BlobSidecar,
 		return nil, err
 	}
 
-	return blob.BlobSidecar, nil
+	return blob, nil
 }
 
 func (p *PrysmBlobStorage) Valid(root [32]byte, denebSidecar *deneb.BlobSidecar) (bool, error) {
-	sidecar := ConvSideCar(denebSidecar)
-	ROBlob, err := blocks.NewROBlobWithRoot(sidecar, root)
+	sidecar1 := ConvSideCar(denebSidecar)
+	marshal1, err := sidecar1.MarshalSSZ()
 	if err != nil {
 		return false, err
 	}
-	marshal1, err := sidecar.MarshalSSZ()
+	sidecar2, err := p.Get(root, sidecar1.Index)
 	if err != nil {
 		return false, err
 	}
-	marshal2, err := ROBlob.BlobSidecar.MarshalSSZ()
+	marshal2, err := sidecar2.MarshalSSZ()
 	if err != nil {
 		return false, err
 	}

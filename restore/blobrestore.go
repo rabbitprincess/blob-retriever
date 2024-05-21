@@ -21,13 +21,12 @@ type BlobRestore struct {
 }
 
 // NewBlobRestore
-func NewBlobRestore(ctx context.Context, cfg *Config) *BlobRestore {
-	logger := zerolog.New(nil)
-	client, err := NewBeaconClient(ctx, cfg.beaconUrl, uint64(cfg.timeOut.Seconds()))
+func NewBlobRestore(ctx context.Context, logger zerolog.Logger, cfg *Config) *BlobRestore {
+	client, err := NewBeaconClient(ctx, cfg.BeaconUrl, uint64(cfg.Timeout.Seconds()))
 	if err != nil {
 		logger.Panic().Err(err).Msg("Failed to create beacon client")
 	}
-	storage, err := NewPrysmBlobStorage(cfg.storagePath)
+	storage, err := NewPrysmBlobStorage(cfg.StoragePath)
 	if err != nil {
 		logger.Panic().Err(err).Msg("Failed to create blob storage")
 	}

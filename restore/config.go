@@ -7,20 +7,24 @@ const (
 	minBlobSlot   = 8626176 // mainnet minimum slot which save blobs
 )
 
-func NewConfig(beaconUrl string, timeout time.Duration, storagePath string) *Config {
+func NewConfig(beaconUrl string, timeout time.Duration, storageType, storagePath string) *Config {
 	if timeout == 0 {
 		timeout = serverTimeout
 	}
+	if storageType == "" {
+		storageType = "prysm"
+	}
 	return &Config{
-		beaconUrl:   beaconUrl,
-		timeOut:     serverTimeout,
-		storagePath: storagePath,
+		BeaconUrl:   beaconUrl,
+		Timeout:     serverTimeout,
+		StorageType: storageType,
+		StoragePath: storagePath,
 	}
 }
 
 type Config struct {
-	beaconUrl string
-	timeOut   time.Duration
-
-	storagePath string
+	BeaconUrl   string
+	Timeout     time.Duration
+	StorageType string
+	StoragePath string
 }
