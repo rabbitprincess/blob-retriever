@@ -77,6 +77,8 @@ func (bs *BlobRestore) Run(ctx context.Context, mode string, fromSlot, toSlot ui
 			}
 		})
 	}
+	bs.wp.StopWait()
+	bs.logger.Info().Uint64("fromSlot", fromSlot).Uint64("toSlot", toSlot).Msg("All tasks are done")
 	return nil
 }
 
