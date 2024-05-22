@@ -10,6 +10,7 @@ import (
 	apiv1 "github.com/attestantio/go-eth2-client/api/v1"
 	"github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/avast/retry-go"
+	"github.com/gammazero/workerpool"
 	"github.com/rabbitprincess/blob-retriever/storage"
 	"github.com/rs/zerolog"
 )
@@ -17,12 +18,14 @@ import (
 type BlobRestore struct {
 	cfg     *Config
 	logger  zerolog.Logger
+	wp      *workerpool.WorkerPool
 	client  BeaconClient
 	storage storage.BlobStore
 }
 
 // NewBlobRestore
 func NewBlobRestore(ctx context.Context, log zerolog.Logger, cfg *Config) *BlobRestore {
+	wp := workerpool.New(int(cfg.NumWorker))
 	client, err := NewBeaconClient(ctx, cfg.BeaconUrl, cfg.Timeout)
 	if err != nil {
 		log.Panic().Err(err).Msg("Failed to create beacon client")
@@ -34,6 +37,7 @@ func NewBlobRestore(ctx context.Context, log zerolog.Logger, cfg *Config) *BlobR
 	return &BlobRestore{
 		cfg:     cfg,
 		logger:  log,
+		wp:      wp,
 		client:  client,
 		storage: storage,
 	}
@@ -50,26 +54,28 @@ func (bs *BlobRestore) Run(ctx context.Context, mode string, fromSlot, toSlot ui
 	}
 
 	for slot := fromSlot; slot <= toSlot; slot++ {
-		header, sidecars, err := bs.GetV1BlobFromApi(ctx, slot)
-		if err != nil || header.Root.IsZero() {
-			bs.logger.Info().Uint64("slot", slot).Err(err).Msg("block is not existing, continue...")
-			continue
-		}
-		if len(sidecars) == 0 {
-			bs.logger.Info().Uint64("slot", slot).Msg("blob sidecars not exist, continue...")
-			continue
-		}
+		bs.wp.Submit(func() {
+			header, sidecars, err := bs.GetV1BlobFromApi(ctx, slot)
+			if err != nil || header.Root.IsZero() {
+				bs.logger.Info().Uint64("slot", slot).Err(err).Msg("block is not existing, continue...")
+				return
+			}
+			if len(sidecars) == 0 {
+				bs.logger.Info().Uint64("slot", slot).Msg("blob sidecars not exist, continue...")
+				return
+			}
 
-		switch mode {
-		case "retrieve":
-			if err := bs.RestoreBlob(ctx, slot, header, sidecars); err != nil {
-				bs.logger.Panic().Uint64("slot", slot).Err(err).Msg("Failed to restore blob")
+			switch mode {
+			case "retrieve":
+				if err := bs.RestoreBlob(ctx, slot, header, sidecars); err != nil {
+					bs.logger.Panic().Uint64("slot", slot).Err(err).Msg("Failed to restore blob")
+				}
+			case "check":
+				if err := bs.CheckBlobSidecar(ctx, slot, header, sidecars); err != nil {
+					bs.logger.Error().Uint64("slot", slot).Err(err).Msg("Failed to check blob sidecar")
+				}
 			}
-		case "check":
-			if err := bs.CheckBlobSidecar(ctx, slot, header, sidecars); err != nil {
-				bs.logger.Error().Uint64("slot", slot).Err(err).Msg("Failed to check blob sidecar")
-			}
-		}
+		})
 	}
 	return nil
 }
