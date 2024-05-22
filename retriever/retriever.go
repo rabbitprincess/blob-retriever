@@ -1,4 +1,4 @@
-package blob
+package retriever
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	apiv1 "github.com/attestantio/go-eth2-client/api/v1"
 	"github.com/attestantio/go-eth2-client/spec/deneb"
 	"github.com/avast/retry-go"
+	"github.com/rabbitprincess/blob-retriever/storage"
 	"github.com/rs/zerolog"
 )
 
@@ -17,7 +18,7 @@ type BlobRestore struct {
 	cfg     *Config
 	logger  zerolog.Logger
 	client  BeaconClient
-	storage BlobStore
+	storage storage.BlobStore
 }
 
 // NewBlobRestore
@@ -26,7 +27,7 @@ func NewBlobRestore(ctx context.Context, log zerolog.Logger, cfg *Config) *BlobR
 	if err != nil {
 		log.Panic().Err(err).Msg("Failed to create beacon client")
 	}
-	storage, err := NewPrysmBlobStorage(log, cfg.StoragePath)
+	storage, err := storage.NewPrysmBlobStorage(log, cfg.StoragePath)
 	if err != nil {
 		log.Panic().Err(err).Msg("Failed to create blob storage")
 	}

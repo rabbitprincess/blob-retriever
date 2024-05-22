@@ -1,4 +1,4 @@
-package blob
+package storage
 
 import "github.com/attestantio/go-eth2-client/spec/deneb"
 
