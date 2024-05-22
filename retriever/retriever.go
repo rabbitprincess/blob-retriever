@@ -85,6 +85,7 @@ func (bs *BlobRestore) RestoreBlob(ctx context.Context, slot uint64, header *api
 			bs.logger.Error().Uint64("slot", slot).Str("root", header.Root.String()).Err(err).Msg("Failed to save blob sidecar")
 			return err
 		}
+		bs.logger.Info().Uint64("slot", slot).Str("root", header.Root.String()).Uint64("index", uint64(sidecar.Index)).Msg("Blob sidecar saved")
 	}
 	return nil
 }
@@ -129,7 +130,7 @@ func (bs *BlobRestore) GetV1BlobFromApi(ctx context.Context, slot uint64) (*apiv
 		}
 
 		return nil
-	}, retry.Attempts(5), retry.Delay(1*time.Second)); err != nil {
+	}, retry.Attempts(1), retry.Delay(100*time.Millisecond)); err != nil {
 		bs.logger.Error().Uint64("slot", slot).Err(err).Msg("Failed to get block header")
 		return nil, nil, err
 	}
