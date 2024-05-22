@@ -51,14 +51,12 @@ func (bs *BlobRestore) Run(ctx context.Context, mode string, fromSlot, toSlot ui
 
 	for slot := fromSlot; slot <= toSlot; slot++ {
 		header, sidecars, err := bs.GetV1BlobFromApi(ctx, slot)
-		if err != nil {
-			bs.logger.Panic().Uint64("slot", slot).Err(err).Msg("Failed to get block header")
-		}
-		if header.Root.IsZero() {
-			bs.logger.Error().Uint64("slot", slot).Msg("Block not exist in api")
+		if err != nil || header.Root.IsZero() {
+			bs.logger.Info().Uint64("slot", slot).Err(err).Msg("block is not existing, continue...")
 			continue
 		}
 		if len(sidecars) == 0 {
+			bs.logger.Info().Uint64("slot", slot).Msg("blob sidecars not exist, continue...")
 			continue
 		}
 
