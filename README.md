@@ -1,5 +1,5 @@
-# blob_restorer
-restore pruned blob for prysm and lighthouse
+# blob-retriever
+restore pruned blob for prysm
 
 ## Usage
 

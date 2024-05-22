@@ -122,7 +122,6 @@ func (bs *BlobRestore) GetV1BlobFromApi(ctx context.Context, slot uint64) (*apiv
 			Block: strconv.FormatUint(slot, 10),
 		})
 		if err != nil {
-			bs.logger.Error().Uint64("slot", slot).Err(err).Msg("Failed to get block root | retrying...")
 			return err
 		}
 		header = res.Data
@@ -139,7 +138,6 @@ func (bs *BlobRestore) GetV1BlobFromApi(ctx context.Context, slot uint64) (*apiv
 
 		return nil
 	}, retry.Attempts(1), retry.Delay(100*time.Millisecond)); err != nil {
-		bs.logger.Error().Uint64("slot", slot).Err(err).Msg("Failed to get block header")
 		return nil, nil, err
 	}
 
