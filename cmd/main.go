@@ -25,12 +25,12 @@ var (
 func init() {
 	fs := rootCmd.PersistentFlags()
 	fs.StringVarP(&mode, "mode", "m", "retrieve", "run mode (retrieve / check)")
-	fs.StringVarP(&beaconUrl, "beacon", "b", "https://ethereum-beacon-api.publicnode.com", "Beacon node URL")
-	fs.StringVarP(&storagePath, "storage_path", "p", "../data", "Path to store blobs")
+	fs.StringVarP(&beaconUrl, "beacon", "b", "", "Beacon node URL")
+	fs.StringVarP(&storagePath, "storage_path", "p", "", "Path to store blobs")
 	// only support prysm for now
 	// fs.StringVarP(&storagePath, "storage_type", "s", "prysm", "Type to storage ( prysm or lighthouse )")
-	fs.Uint64VarP(&fromSlot, "from", "f", 8759552, "Start slot")
-	fs.Uint64VarP(&toSlot, "to", "t", 8759562, "End slot")
+	fs.Uint64VarP(&fromSlot, "from", "f", 0, "Start slot")
+	fs.Uint64VarP(&toSlot, "to", "t", 0, "End slot")
 }
 
 func main() {
