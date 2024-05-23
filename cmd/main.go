@@ -29,7 +29,7 @@ func init() {
 	fs := rootCmd.PersistentFlags()
 	fs.StringVarP(&mode, "mode", "m", "retrieve", "run mode (retrieve / check)")
 	fs.StringVarP(&beaconUrl, "beacon", "b", "", "Beacon node URL")
-	fs.StringVarP(&storagePath, "storage_path", "p", "", "Path to store blobs")
+	fs.StringVarP(&storagePath, "blobs_data", "d", "", "Path to store blobs")
 	// only support prysm for now
 	// fs.StringVarP(&storagePath, "storage_type", "s", "prysm", "Type to storage ( prysm or lighthouse )")
 	fs.Uint8VarP(&numWorker, "worker", "w", 1, "Number of worker")
