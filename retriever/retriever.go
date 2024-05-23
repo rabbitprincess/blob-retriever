@@ -26,7 +26,7 @@ type BlobRestore struct {
 // NewBlobRestore
 func NewBlobRestore(ctx context.Context, log zerolog.Logger, cfg *Config) *BlobRestore {
 	wp := workerpool.New(int(cfg.NumWorker))
-	client, err := NewBeaconClient(ctx, cfg.BeaconUrl, cfg.Timeout)
+	client, err := NewBeaconClient(ctx, cfg.BeaconUrl, cfg.BeaconType, cfg.Timeout)
 	if err != nil {
 		log.Panic().Err(err).Msg("Failed to create beacon client")
 	}

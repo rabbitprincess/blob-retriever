@@ -20,7 +20,7 @@ func TestGetBlockRootBySlot(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	bc, err := NewBeaconClient(ctx, beaconUrl, time.Second*5)
+	bc, err := NewBeaconClient(ctx, beaconUrl, "any", time.Second*5)
 	require.NoError(t, err)
 
 	for _, test := range []struct {

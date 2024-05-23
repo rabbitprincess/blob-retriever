@@ -15,15 +15,20 @@ type BeaconClient interface {
 }
 
 // NewBeaconClient returns a new HTTP beacon client.
-func NewBeaconClient(ctx context.Context, beaconUrl string, timeout time.Duration) (BeaconClient, error) {
+func NewBeaconClient(ctx context.Context, beaconUrl string, beaconType string, timeout time.Duration) (BeaconClient, error) {
 	cctx, cancel := context.WithCancel(ctx)
 	defer cancel()
+
+	var withEnforceJSON bool
+	if beaconType == "prysm" {
+		withEnforceJSON = true
+	}
 
 	c, err := http.New(cctx,
 		http.WithTimeout(timeout),
 		http.WithAddress(beaconUrl),
 		http.WithLogLevel(zerolog.ErrorLevel),
-		// http.WithEnforceJSON(cfg.EnforceJSON),
+		http.WithEnforceJSON(withEnforceJSON),
 	)
 	if err != nil {
 		return nil, err
