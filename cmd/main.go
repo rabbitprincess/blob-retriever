@@ -50,7 +50,7 @@ func rootRun(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 
 	cfg := retriever.NewConfig(beaconUrl, beaconType, 0, storageType, dataPath, numWorker)
-	blobRestore := retriever.NewBlobRestore(ctx, logger, cfg)
+	blobRestore := retriever.NewBlobRetriever(ctx, logger, cfg)
 
 	logger.Info().Str("mode", mode).Uint64("from slot", fromSlot).Uint64("to slot", toSlot).Msg("Run blob retriever")
 

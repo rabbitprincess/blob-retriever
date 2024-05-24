@@ -15,7 +15,7 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type BlobRestore struct {
+type BlobRetriever struct {
 	cfg     *Config
 	logger  zerolog.Logger
 	wp      *workerpool.WorkerPool
@@ -23,8 +23,8 @@ type BlobRestore struct {
 	storage storage.BlobStore
 }
 
-// NewBlobRestore
-func NewBlobRestore(ctx context.Context, log zerolog.Logger, cfg *Config) *BlobRestore {
+// NewBlobRetriever
+func NewBlobRetriever(ctx context.Context, log zerolog.Logger, cfg *Config) *BlobRetriever {
 	wp := workerpool.New(int(cfg.NumWorker))
 	client, err := NewBeaconClient(ctx, cfg.BeaconUrl, cfg.BeaconType, cfg.Timeout)
 	if err != nil {
@@ -34,7 +34,7 @@ func NewBlobRestore(ctx context.Context, log zerolog.Logger, cfg *Config) *BlobR
 	if err != nil {
 		log.Panic().Err(err).Msg("Failed to create blob storage")
 	}
-	return &BlobRestore{
+	return &BlobRetriever{
 		cfg:     cfg,
 		logger:  log,
 		wp:      wp,
@@ -43,7 +43,7 @@ func NewBlobRestore(ctx context.Context, log zerolog.Logger, cfg *Config) *BlobR
 	}
 }
 
-func (bs *BlobRestore) Run(ctx context.Context, mode string, fromSlot, toSlot uint64) error {
+func (bs *BlobRetriever) Run(ctx context.Context, mode string, fromSlot, toSlot uint64) error {
 	if fromSlot < minBlobSlot {
 		bs.logger.Warn().Uint64("fromSlot", fromSlot).Uint64("minBlobSlot", minBlobSlot).Msg("fromSlot is less than minBlobSlot, set fromSlot to minBlobSlot")
 		fromSlot = minBlobSlot
@@ -82,7 +82,7 @@ func (bs *BlobRestore) Run(ctx context.Context, mode string, fromSlot, toSlot ui
 	return nil
 }
 
-func (bs *BlobRestore) RestoreBlob(ctx context.Context, slot uint64, header *apiv1.BeaconBlockHeader, sidecars []*deneb.BlobSidecar) error {
+func (bs *BlobRetriever) RestoreBlob(ctx context.Context, slot uint64, header *apiv1.BeaconBlockHeader, sidecars []*deneb.BlobSidecar) error {
 	if bs.storage.Exist(header.Root) {
 		bs.logger.Info().Str("root", header.Root.String()).Msg("Blob already exists in storage, continue")
 		return nil
@@ -98,7 +98,7 @@ func (bs *BlobRestore) RestoreBlob(ctx context.Context, slot uint64, header *api
 	return nil
 }
 
-func (bs *BlobRestore) CheckBlobSidecar(ctx context.Context, slot uint64, header *apiv1.BeaconBlockHeader, sidecars []*deneb.BlobSidecar) error {
+func (bs *BlobRetriever) CheckBlobSidecar(ctx context.Context, slot uint64, header *apiv1.BeaconBlockHeader, sidecars []*deneb.BlobSidecar) error {
 	for _, sidecar := range sidecars {
 		valid, err := bs.storage.Valid(header.Root, sidecar)
 		if err != nil {
@@ -114,7 +114,7 @@ func (bs *BlobRestore) CheckBlobSidecar(ctx context.Context, slot uint64, header
 	return nil
 }
 
-func (bs *BlobRestore) GetV1BlobFromApi(ctx context.Context, slot uint64) (*apiv1.BeaconBlockHeader, []*deneb.BlobSidecar, error) {
+func (bs *BlobRetriever) GetV1BlobFromApi(ctx context.Context, slot uint64) (*apiv1.BeaconBlockHeader, []*deneb.BlobSidecar, error) {
 	var header *apiv1.BeaconBlockHeader
 	var sidecars []*deneb.BlobSidecar
 	if err := retry.Do(func() error {
