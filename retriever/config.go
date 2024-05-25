@@ -7,7 +7,7 @@ const (
 	minBlobSlot   = 8626176 // mainnet minimum slot which save blobs
 )
 
-func NewConfig(beaconUrl, beaconType string, timeout time.Duration, storageType, storagePath string, numWorker uint8) *Config {
+func NewConfig(beaconUrl, beaconType string, timeout time.Duration, storageType, storagePath string, numWorker uint64) *Config {
 	if timeout == 0 {
 		timeout = serverTimeout
 	}
@@ -31,5 +31,5 @@ type Config struct {
 	Timeout     time.Duration
 	StorageType string
 	StoragePath string
-	NumWorker   uint8
+	NumWorker   uint64
 }
