@@ -56,24 +56,30 @@ func (bs *BlobRetriever) Run(ctx context.Context, mode string, fromSlot, toSlot 
 	for slot := fromSlot; slot <= toSlot; slot++ {
 		bs.wp.Submit(func() {
 			header, sidecars, err := bs.GetV1BlobFromApi(ctx, slot)
-			if err != nil || header.Root.IsZero() {
-				bs.logger.Info().Uint64("slot", slot).Err(err).Msg("block is not existing, continue...")
+			if err != nil {
+				bs.logger.Panic().Uint64("slot", slot).Err(err).Msg("Failed to get blob from block.")
 				return
 			}
-			if len(sidecars) == 0 {
-				bs.logger.Info().Uint64("slot", slot).Msg("blob sidecars not exist, continue...")
+			// check empty block and sidecar
+			if header == nil {
+				bs.logger.Info().Uint64("slot", slot).Msg("block not exist in slot, continue...")
+				return
+			} else if len(sidecars) == 0 {
+				bs.logger.Info().Uint64("slot", slot).Str("root", header.Root.String()).Msg("blob sidecars not exist, continue...")
 				return
 			}
 
 			switch mode {
 			case "retrieve":
 				if err := bs.RestoreBlob(ctx, slot, header, sidecars); err != nil {
-					bs.logger.Panic().Uint64("slot", slot).Err(err).Msg("Failed to restore blob")
+					bs.logger.Panic().Uint64("slot", slot).Str("root", header.Root.String()).Err(err).Msg("Failed to restore blob")
 				}
 			case "check":
 				if err := bs.CheckBlobSidecar(ctx, slot, header, sidecars); err != nil {
-					bs.logger.Error().Uint64("slot", slot).Err(err).Msg("Failed to check blob sidecar")
+					bs.logger.Panic().Uint64("slot", slot).Str("root", header.Root.String()).Err(err).Msg("Failed to check blob sidecar")
 				}
+			default:
+				bs.logger.Panic().Str("mode", mode).Msg("Unknown mode. Only support 'retrieve' or 'check' mode")
 			}
 		})
 	}
@@ -122,6 +128,11 @@ func (bs *BlobRetriever) GetV1BlobFromApi(ctx context.Context, slot uint64) (*ap
 			Block: strconv.FormatUint(slot, 10),
 		})
 		if err != nil {
+			if apiErr, ok := err.(*api.Error); ok {
+				if apiErr.StatusCode == 404 {
+					return nil
+				}
+			}
 			return err
 		}
 		header = res.Data
@@ -135,9 +146,8 @@ func (bs *BlobRetriever) GetV1BlobFromApi(ctx context.Context, slot uint64) (*ap
 			}
 			sidecars = blobSideCars.Data
 		}
-
 		return nil
-	}, retry.Attempts(1), retry.Delay(100*time.Millisecond)); err != nil {
+	}, retry.Attempts(5), retry.Delay(200*time.Millisecond)); err != nil {
 		return nil, nil, err
 	}
 

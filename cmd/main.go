@@ -9,6 +9,7 @@ import (
 	"github.com/rabbitprincess/blob-retriever/retriever"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -27,16 +28,34 @@ var (
 )
 
 func init() {
+	viper.AutomaticEnv()
+	viper.SetConfigName(".env")
+	viper.SetConfigType("env")
+	viper.AddConfigPath(".")
+	if err := viper.ReadInConfig(); err != nil {
+		panic(err)
+	}
+
+	// Set default values
+	viper.SetDefault("MODE", "retrieve")
+	viper.SetDefault("BEACON_URL", "")
+	viper.SetDefault("BEACON_TYPE", "any")
+	viper.SetDefault("DATA_PATH", "")
+	viper.SetDefault("STORAGE_TYPE", "prysm")
+	viper.SetDefault("NUM_WORKER", 1)
+	viper.SetDefault("FROM_SLOT", 0)
+	viper.SetDefault("TO_SLOT", 0)
+
 	fs := rootCmd.PersistentFlags()
-	fs.StringVarP(&mode, "mode", "m", "retrieve", "run mode (retrieve / check)")
-	fs.StringVarP(&beaconUrl, "beacon_url", "b", "", "Beacon node URL")
-	fs.StringVarP(&beaconType, "beacon_type", "n", "any", "Beacon node network type. ( any or prysm )")
-	fs.StringVarP(&dataPath, "data", "d", "", "data path to store blobs")
+	fs.StringVarP(&mode, "mode", "m", viper.GetString("MODE"), "run mode (retrieve / check)")
+	fs.StringVarP(&beaconUrl, "beacon_url", "b", viper.GetString("BEACON_URL"), "Beacon node URL")
+	fs.StringVarP(&beaconType, "beacon_type", "n", viper.GetString("BEACON_TYPE"), "Beacon node network type. ( any or prysm )")
+	fs.StringVarP(&dataPath, "data", "d", viper.GetString("DATA_PATH"), "data path to store blobs")
 	// only support prysm for now
 	// fs.StringVarP(&storageType, "storage_type", "s", "prysm", "Type to storage ( prysm or lighthouse )")
-	fs.Uint8VarP(&numWorker, "worker", "w", 1, "number of worker")
-	fs.Uint64VarP(&fromSlot, "from", "f", 0, "start slot")
-	fs.Uint64VarP(&toSlot, "to", "t", 0, "end slot")
+	fs.Uint8VarP(&numWorker, "worker", "w", uint8(viper.GetUint64("NUM_WORKER")), "number of worker")
+	fs.Uint64VarP(&fromSlot, "from", "f", viper.GetUint64("FROM_SLOT"), "from slot")
+	fs.Uint64VarP(&toSlot, "to", "t", viper.GetUint64("TO_SLOT"), "to slot")
 }
 
 func main() {
