@@ -123,15 +123,13 @@ func (bs *BlobRetriever) CheckBlobSidecar(ctx context.Context, slot uint64, head
 func (bs *BlobRetriever) GetV1BlobFromApi(ctx context.Context, slot uint64) (*apiv1.BeaconBlockHeader, []*deneb.BlobSidecar, error) {
 	var header *apiv1.BeaconBlockHeader
 	var sidecars []*deneb.BlobSidecar
-	if err := retry.Do(func() error {
+	err := retry.Do(func() error {
 		res, err := bs.client.BeaconBlockHeader(ctx, &api.BeaconBlockHeaderOpts{
 			Block: strconv.FormatUint(slot, 10),
 		})
 		if err != nil {
-			if apiErr, ok := err.(*api.Error); ok {
-				if apiErr.StatusCode == 404 {
-					return nil
-				}
+			if apiErr, ok := err.(*api.Error); ok && apiErr.StatusCode == 404 {
+				return nil
 			}
 			return err
 		}
@@ -147,7 +145,8 @@ func (bs *BlobRetriever) GetV1BlobFromApi(ctx context.Context, slot uint64) (*ap
 			sidecars = blobSideCars.Data
 		}
 		return nil
-	}, retry.Attempts(5), retry.Delay(200*time.Millisecond)); err != nil {
+	}, retry.Attempts(5), retry.Delay(200*time.Millisecond))
+	if err != nil {
 		return nil, nil, err
 	}
 
