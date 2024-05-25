@@ -7,4 +7,4 @@ build:
 	go build -o blob-retriever ./cmd/
 
 run:
-	./blob-retriever
+	nohup ./blob-retriever > output.log 2>&1 &
