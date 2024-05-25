@@ -7,6 +7,17 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var (
+	mode        string
+	beaconUrl   string
+	beaconType  string
+	dataPath    string
+	storageType string
+	numWorker   uint64
+	fromSlot    uint64
+	toSlot      uint64
+)
+
 func flags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
