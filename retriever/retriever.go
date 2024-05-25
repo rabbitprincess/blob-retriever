@@ -28,11 +28,13 @@ func NewBlobRetriever(ctx context.Context, log zerolog.Logger, cfg *Config) *Blo
 	wp := workerpool.New(int(cfg.NumWorker))
 	client, err := NewBeaconClient(ctx, cfg.BeaconUrl, cfg.BeaconType, cfg.Timeout)
 	if err != nil {
-		log.Panic().Err(err).Msg("Failed to create beacon client")
+		log.Error().Err(err).Msg("Failed to create beacon client")
+		return nil
 	}
 	storage, err := storage.NewPrysmBlobStorage(log, cfg.StoragePath)
 	if err != nil {
 		log.Panic().Err(err).Msg("Failed to create blob storage")
+		return nil
 	}
 	return &BlobRetriever{
 		cfg:     cfg,

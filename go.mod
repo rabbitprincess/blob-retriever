@@ -6,6 +6,7 @@ require (
 	github.com/attestantio/go-eth2-client v0.21.4
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/gammazero/workerpool v1.1.3
+	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/prysmaticlabs/prysm/v5 v5.0.3
 	github.com/rs/zerolog v1.33.0

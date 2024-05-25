@@ -33,7 +33,7 @@ func flags() []cli.Flag {
 		&cli.StringFlag{
 			Name:        "data",
 			Aliases:     []string{"d"},
-			Value:       getEnv("DATA_PATH", ""),
+			Value:       getEnv("DATA_PATH", "./blobs"),
 			Usage:       "data path to store blobs",
 			Destination: &dataPath,
 		},
