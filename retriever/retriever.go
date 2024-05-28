@@ -77,7 +77,7 @@ func (bs *BlobRetriever) Run(ctx context.Context, mode string, fromSlot, toSlot 
 					bs.logger.Panic().Uint64("slot", slot).Str("root", header.Root.String()).Err(err).Msg("Failed to restore blob")
 				}
 			case "check":
-				if err := bs.CheckBlobSidecar(ctx, slot, header, sidecars); err != nil {
+				if err := bs.CheckBlob(ctx, slot, header, sidecars); err != nil {
 					bs.logger.Panic().Uint64("slot", slot).Str("root", header.Root.String()).Err(err).Msg("Failed to check blob sidecar")
 				}
 			default:
@@ -106,7 +106,7 @@ func (bs *BlobRetriever) RestoreBlob(ctx context.Context, slot uint64, header *a
 	return nil
 }
 
-func (bs *BlobRetriever) CheckBlobSidecar(ctx context.Context, slot uint64, header *apiv1.BeaconBlockHeader, sidecars []*deneb.BlobSidecar) error {
+func (bs *BlobRetriever) CheckBlob(ctx context.Context, slot uint64, header *apiv1.BeaconBlockHeader, sidecars []*deneb.BlobSidecar) error {
 	for _, sidecar := range sidecars {
 		valid, err := bs.storage.Valid(header.Root, sidecar)
 		if err != nil {
