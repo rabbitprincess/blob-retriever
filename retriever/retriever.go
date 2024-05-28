@@ -92,7 +92,7 @@ func (bs *BlobRetriever) Run(ctx context.Context, mode string, fromSlot, toSlot 
 
 func (bs *BlobRetriever) RestoreBlob(ctx context.Context, slot uint64, header *apiv1.BeaconBlockHeader, sidecars []*deneb.BlobSidecar) error {
 	if bs.storage.Exist(header.Root) {
-		bs.logger.Info().Str("root", header.Root.String()).Msg("Blob already exists in storage, continue...")
+		bs.logger.Info().Uint64("slot", slot).Str("root", header.Root.String()).Msg("Blob already exists in storage, continue...")
 		return nil
 	}
 
