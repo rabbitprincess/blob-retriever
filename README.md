@@ -8,10 +8,7 @@ NAME:
    blob_retriever - Retrieve and check pruned blobs
 
 USAGE:
-   blob_retriever [options] command
-
-COMMANDS:
-   help, h  Shows a list of commands or help for one command
+   blob_retriever [options]
 
 OPTIONS:
    --mode value, -m value       run mode (retrieve / check)
