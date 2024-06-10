@@ -15,21 +15,21 @@ func NewConfig(beaconUrl, beaconType string, timeout time.Duration, storageType,
 		storageType = "prysm"
 	}
 	return &Config{
-		BeaconUrl:   beaconUrl,
-		BeaconType:  beaconType,
-		Timeout:     serverTimeout,
-		StorageType: storageType,
-		StoragePath: storagePath,
-		NumWorker:   numWorker,
+		BeaconApiUrl:  beaconUrl,
+		BeaconApiType: beaconType,
+		Timeout:       serverTimeout,
+		StorageType:   storageType,
+		StoragePath:   storagePath,
+		NumWorker:     numWorker,
 	}
 }
 
 type Config struct {
-	Mode        string
-	BeaconUrl   string
-	BeaconType  string
-	Timeout     time.Duration
-	StorageType string
-	StoragePath string
-	NumWorker   uint64
+	Mode          string
+	BeaconApiUrl  string
+	BeaconApiType string
+	Timeout       time.Duration
+	StorageType   string
+	StoragePath   string
+	NumWorker     uint64
 }

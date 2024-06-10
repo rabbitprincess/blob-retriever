@@ -8,14 +8,14 @@ import (
 )
 
 var (
-	mode        string
-	beaconUrl   string
-	beaconType  string
-	dataPath    string
-	storageType string
-	numWorker   uint64
-	fromSlot    uint64
-	toSlot      uint64
+	mode      string
+	apiUrl    string
+	apiType   string
+	dataPath  string
+	dataType  string
+	numWorker uint64
+	fromSlot  uint64
+	toSlot    uint64
 )
 
 func flags() []cli.Flag {
@@ -28,21 +28,21 @@ func flags() []cli.Flag {
 			Destination: &mode,
 		},
 		&cli.StringFlag{
-			Name:        "beacon_url",
-			Aliases:     []string{"b"},
-			Value:       getEnv("BEACON_URL", ""),
+			Name:        "api_url",
+			Aliases:     []string{"u"},
+			Value:       getEnv("API_URL", ""),
 			Usage:       "Beacon node URL",
-			Destination: &beaconUrl,
+			Destination: &apiUrl,
 		},
 		&cli.StringFlag{
-			Name:        "beacon_type",
-			Aliases:     []string{"n"},
-			Value:       getEnv("BEACON_TYPE", "any"),
+			Name:        "api_type",
+			Aliases:     []string{"a"},
+			Value:       getEnv("API_TYPE", "any"),
 			Usage:       "Beacon node network type (any or prysm)",
-			Destination: &beaconType,
+			Destination: &apiType,
 		},
 		&cli.StringFlag{
-			Name:        "data",
+			Name:        "data_path",
 			Aliases:     []string{"d"},
 			Value:       getEnv("DATA_PATH", "./blobs"),
 			Usage:       "data path to store blobs",
@@ -59,7 +59,7 @@ func flags() []cli.Flag {
 			Name:        "from",
 			Aliases:     []string{"f"},
 			Value:       getEnvAsUint64("FROM_SLOT", 0),
-			Usage:       "from slot",
+			Usage:       "from slot. minimum is 8626176",
 			Destination: &fromSlot,
 		},
 		&cli.Uint64Flag{

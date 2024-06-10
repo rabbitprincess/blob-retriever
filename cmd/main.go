@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load("../.env")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -22,7 +22,7 @@ func main() {
 
 	app := &cli.App{
 		Name:  "blob_retriever",
-		Usage: "Retrieve and check blobs",
+		Usage: "Retrieve and check pruned blobs",
 		Flags: flags(),
 		Action: func(c *cli.Context) error {
 			return rootRun()
@@ -39,7 +39,7 @@ func rootRun() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	cfg := retriever.NewConfig(beaconUrl, beaconType, 0, storageType, dataPath, numWorker)
+	cfg := retriever.NewConfig(apiUrl, apiType, 0, dataType, dataPath, numWorker)
 	blobRetriever := retriever.NewBlobRetriever(ctx, logger, cfg)
 	if blobRetriever == nil {
 		logger.Error().Msg("Failed to create blob retriever")

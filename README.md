@@ -5,23 +5,23 @@ restore pruned blob for prysm
 
 ```
 NAME:
-   blob_retriever - Retrieve and check blobs
+   blob_retriever - Retrieve and check pruned blobs
 
 USAGE:
-   blob_retriever [global options] command [command options] [arguments...]
+   blob_retriever [options] command
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
 
-GLOBAL OPTIONS:
-   --mode value, -m value         run mode (retrieve / check) (default: "retrieve")
-   --beacon_url value, -b value   Beacon node URL
-   --beacon_type value, -n value  Beacon node network type (any or prysm) (default: "any")
-   --data value, -d value         data path to store blobs
-   --worker value, -w value       number of workers (default: 1)
-   --from value, -f value         from slot (default: 0)
-   --to value, -t value           to slot (default: 0)
-   --help, -h                     show help
+OPTIONS:
+   --mode value, -m value       run mode (retrieve / check)
+   --api_url value, -u value    Beacon node URL
+   --api_type value, -a value   Beacon node network type (any or prysm)
+   --data_path value, -d value  data path to store blobs
+   --worker value, -w value     number of workers
+   --from value, -f value       from slot. minimum is 8626176
+   --to value, -t value         to slot
+   --help, -h                   show help
 ```
 
 ## Build and run

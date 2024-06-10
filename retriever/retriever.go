@@ -26,7 +26,7 @@ type BlobRetriever struct {
 // NewBlobRetriever
 func NewBlobRetriever(ctx context.Context, log zerolog.Logger, cfg *Config) *BlobRetriever {
 	wp := workerpool.New(int(cfg.NumWorker))
-	client, err := NewBeaconClient(ctx, cfg.BeaconUrl, cfg.BeaconType, cfg.Timeout)
+	client, err := NewBeaconClient(ctx, cfg.BeaconApiUrl, cfg.BeaconApiType, cfg.Timeout)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to create beacon client")
 		return nil
