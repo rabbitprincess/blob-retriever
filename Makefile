@@ -4,7 +4,7 @@ all:
 	make build && make run
 
 build:
-	go build -o blob-retriever ./cmd/
+	CGO_ENABLED=0 go build -o blob-retriever ./cmd/
 
 run:
-	nohup ./blob-retriever > output.log 2>&1 &
+	cp -n .env ./cmd/ && nohup ./blob-retriever > output.log 2>&1 &
