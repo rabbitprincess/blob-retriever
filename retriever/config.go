@@ -4,7 +4,6 @@ import "time"
 
 const (
 	serverTimeout = 60 * time.Second
-	minBlobSlot   = 8626176 // mainnet minimum slot which save blobs
 )
 
 func NewConfig(beaconUrl, beaconType string, timeout time.Duration, storageType, storagePath string, numWorker uint64) *Config {

@@ -46,10 +46,6 @@ func NewBlobRetriever(ctx context.Context, log zerolog.Logger, cfg *Config) *Blo
 }
 
 func (bs *BlobRetriever) Run(ctx context.Context, mode string, fromSlot, toSlot uint64) error {
-	if fromSlot < minBlobSlot {
-		bs.logger.Warn().Uint64("fromSlot", fromSlot).Uint64("minBlobSlot", minBlobSlot).Msg("fromSlot is less than minBlobSlot, set fromSlot to minBlobSlot")
-		fromSlot = minBlobSlot
-	}
 	if toSlot < fromSlot {
 		bs.logger.Warn().Uint64("toSlot", toSlot).Uint64("fromSlot", fromSlot).Msg("toSlot is less than fromSlot, set toSlot to fromSlot")
 		toSlot = fromSlot
